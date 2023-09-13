@@ -1,0 +1,11 @@
+.search-panel {
+    margin-bottom: 20px;
+
+    input {
+        border: none;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+}
