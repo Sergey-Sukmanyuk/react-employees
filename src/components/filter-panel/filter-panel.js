@@ -1,14 +1,28 @@
+import "./filter-panel.scss";
 
-import './filter-panel.scss'
+const FilterPanel = (props) => {
+  const btnsData = [
+    { name: "all", value: "Всі співробітники" },
+    { name: "rise", value: "На підвищення" },
+    { name: "more", value: "З/П більше 1000$" },
+  ];
 
-const FilterPanel = () => {
+  const buttons = btnsData.map(({ name, value }) => {
+    const clazz = props.active === name ? "btn-light" : "btn-outline-light";
     return (
-        <div className='filter-panel'>
-            <button type="button" className="btn btn-outline-light active">Всі співробітники</button>
-            <button type="button" className="btn btn-outline-light">На підвищення</button>
-            <button type="button" className="btn btn-outline-light">З/П більше 1000$</button>
-        </div>
-    )
-}
+      <button
+        key={name}
+        type="button"
+        className={`btn ${clazz}`}
+        onClick={() => {
+          props.onFilterClick(name);
+        }}
+      >
+        {value}
+      </button>
+    );
+  });
+  return <div className="filter-panel">{buttons}</div>;
+};
 
 export default FilterPanel;

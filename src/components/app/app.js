@@ -16,63 +16,109 @@ class App extends Component {
     this.state = {
       data: [
         { id: 1, name: "John S.", salary: 800, increase: false, review: true },
-        { id: 2, name: "Devid J.", salary: 2000, increase: true, review: false },
-        { id: 3, name: "Samuel P.", salary: 3000, increase: false, review: false },
+        {
+          id: 2,
+          name: "Devid J.",
+          salary: 2000,
+          increase: true,
+          review: false,
+        },
+        {
+          id: 3,
+          name: "Samuel P.",
+          salary: 3000,
+          increase: false,
+          review: false,
+        },
       ],
+      term: "",
+      active: "all",
     };
   }
 
   onDelete = (id) => {
     this.setState({
-        data: this.state.data.filter(item => item.id !== id)
-    })
-  }
+      data: this.state.data.filter((item) => item.id !== id),
+    });
+  };
 
   onPropToggle = (id, value) => {
     this.setState(({ data }) => ({
-        data: data.map(item => {
-            if(item.id === id) {
-                return {...item, [value]: !item[value]}
-            }
-            return item
-        })
+      data: data.map((item) => {
+        if (item.id === id) {
+          return { ...item, [value]: !item[value] };
+        }
+        return item;
+      }),
     }));
-  }
+  };
 
   addEmployee = (data) => {
     const newEmpl = {
-       name: data.name,
-       salary: data.salary,
-       id: nextId(),
-       increase: false,
-       review: false 
-    }
+      name: data.name,
+      salary: data.salary,
+      id: nextId(),
+      increase: false,
+      review: false,
+    };
 
     this.setState(({ data }) => {
-        const newData = [...data, newEmpl]
+      const newData = [...data, newEmpl];
 
-        return {
-            data: newData
-        }
-    })
-  }
+      return {
+        data: newData,
+      };
+    });
+  };
 
+  emplSearch = (data, term) => {
+    if (!term.length) return data;
+
+    return data.filter((item) => {
+      return item.name.indexOf(term) > -1;
+    });
+  };
+
+  getTerm = (term) => {
+    this.setState({ term });
+  };
+
+  toggleFilter = (data, active) => {
+    switch (active) {
+      case "rise":
+        return data.filter((item) => item.review);
+      case "more":
+        return data.filter((item) => item.salary > 1000);
+      default:
+        return data;
+    }
+  };
+
+  onFilterClick = (active) => {
+    this.setState({active})
+  };
 
   render() {
-    const employees = this.state.data.length;
-    const salaryReview = this.state.data.filter(item => item.review).length;
+    const { data, term, active } = this.state;
+    const employees = data.length;
+    const salaryReview = data.filter((item) => item.review).length;
+    const visibleData =this.toggleFilter(this.emplSearch(data, term), active);
 
     return (
       <div className="app">
         <AppInfo employees={employees} salaryReview={salaryReview} />
 
         <div className="filter-bar">
-          <SearchPanel />
-          <FilterPanel />
+          <SearchPanel getTerm={this.getTerm} />
+          <FilterPanel active={active} onFilterClick={this.onFilterClick}/>
         </div>
 
-        <EmployeesList data={this.state.data} onDelete={this.onDelete} onPropToggle={this.onPropToggle} />
-        <AddEmployeesForm addEmployee={this.addEmployee}/>
+        <EmployeesList
+          data={visibleData}
+          onDelete={this.onDelete}
+          onPropToggle={this.onPropToggle}
+        />
+        <AddEmployeesForm addEmployee={this.addEmployee} />
       </div>
     );
   }
